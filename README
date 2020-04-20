@@ -1,5 +1,5 @@
 <html>
-<h1>WiFi Flood</h1>
+<html><h1>WiFi Flood</h1></html>
 <h3>Written by @floordiv on python3</h3>
 Sends udp flood to the given ip:port
 
