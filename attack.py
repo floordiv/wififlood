@@ -22,27 +22,34 @@ config = {
 def printer():
     begin = int(config['begin'])
     last_packets_sent_counter = 0
+    timeout = float(config['timeout'])
     while True:
         if config['total_packets_sent'] > last_packets_sent_counter:
             print('[{} SECS] Sent {} packets and {} bytes'.format(int(time.time() - begin),
                                                                   config['total_packets_sent'],
                                                                   config['total_bytes_sent']))
             last_packets_sent_counter = config['total_packets_sent']
-        time.sleep(float(config['timeout']))
+        time.sleep(timeout)
 
 
 def start():
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        ip, port = config['ip'], int(config['port'])
+
+        packet_len = int(config['packet-len'])
+        timeout = float(config['timeout'])
+
         while config['duration'] == 'inf' or config['begin'] + int(config['duration']) > time.time():
             try:
-                sock.sendto(random._urandom(int(config['packet-len'])), (config['ip'], int(config['port'])))
+                sock.sendto(random._urandom(packet_len), (ip, port))
             except OSError:
                 continue
             config['total_packets_sent'] += 1
-            config['total_bytes_sent'] += int(config['packet-len'])
+            config['total_bytes_sent'] += packet_len
 
-            time.sleep(float(config['timeout']))
+            time.sleep(timeout)
     except BrokenPipeError:
         print('[ERROR] Router has closed the connection')
 

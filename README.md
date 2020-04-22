@@ -1,9 +1,9 @@
-WiFi Flood
-Written by @floordiv on python3
+# WiFi Flood
+### Written by @floordiv on python3
 
-Sends udp flood to the given ip:port
+### Sends udp flood to the given ip:port
 
-How to use:
+##How to use:
     python3 attack.py <ip> <port> [arguments]
 
     Arguments:
