@@ -4,7 +4,7 @@
   ####    Sends udp flood to the given ip:port
 
 ## How to use:
-##### python3 attack.py <ip> <port> [arguments]
+##### python3 attack.py ip port [arguments]
 
 ##### Arguments:
      --duration <seconds> - set floording duration. inf for infinity flooding
